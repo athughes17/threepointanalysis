@@ -1,6 +1,6 @@
 # Three Point Analysis
 
-This repository was meant to analyze the three pointer in comparison with offensive efficiency
+This repository was meant to analyze the three pointer in comparison with offensive efficiency to give an overall overview as to why three pointers have become so prevalent in recent years
 
 ## Data
 
