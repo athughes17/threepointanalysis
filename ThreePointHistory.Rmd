@@ -1,0 +1,221 @@
+---
+title: "Analysis of the History of the Three-Pointer"
+author: "Alec Hughes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = TRUE,
+  warning = TRUE
+  )
+
+knitr::opts_knit$set(
+  root.dir = "."
+  )
+```
+
+### Statement of Intent:
+
+People often complain about the amount of three pointers shot in the modern NBA. I am sure that anyone discussing the NBA has heard that players just "chuck threes" I want to investigate why this is. Is there a statistical reason why the NBA has changed so drastically? Is it rule-based? Were offenses truly better? I want to investigate if the game has truly lost appeal, or if it has evolved to actually be better than we previously thought. To do this, I want to look at some statistics specifically looking at the amount of 3 pointers, comparing it to offensive efficiency and looking at that over time. I also believe it will be interesting to investigate how some of the best 3 point shooters have evolved over time, and comparing the highest made three pointers by season. To do this, I will perform a statistical analysis using R code and creating
+visualizations to demonstrate.
+
+
+### Summary of Findings
+The three point shot was first introduced in the 1979-1980 NBA season, and it was seen almost as a circus trick. How could a shot from so far away be worth taking compared to the dominant big men of the era getting post shots? While it may have been a gimmick when first introduced, the three pointer singlehandedly dominates the modern NBA, even leading to criticism of the shot overall.
+
+The NBA has recently been critiqued for the large amount of three pointers that are shot in today's game, especially in comparison to how basketball was played in the 1990s. Many casual fans will assert that three pointers are shot too frequently, and that the game is worse for it. But is this opinion true, are NBA teams shooting too many threes, or have the offenses of the modern era actually evolved. 
+
+To investigate and see if offenses have evolved, or if they have actually worsened we must first decide how to measure offense. The easiest way to see how offenses are performing would be seeing the average amount of points being scored by a team in an average game. However, this would actually be a poor way of proving this assertion. Points in a vacuum do not show an offense's capability as it has no regard for efficiency, and most importantly, pace. Pace has varied throughout NBA history, as the 70s were known for incredibly quick pace, while the early 2000s had an extremely slow pace with very few possessions relative to other seasons. Offensive rating can be used to measure overall offense, as it measures the amount of points scored per 100 possessions. This means that pace and efficiency are accounted for, because the most effective offenses will score at a high point per possession.
+
+The change in the amount of three pointers is as drastic as people have claimed. The amount of three pointers made per NBA game is around three times as many as it was in the 1990s, which is a huge jump and would be a reason as to why people believe threes have become too common. Additionally, the increase is not limited to the amount of makes, but the amount of attempts, as about 40% of shots attempted in the 2020s are three pointers, while in the 1990s it was between 10 and 15%. Three pointers have transformed the modern NBA in this way, as they are one of the most frequent shots attempted at this point, while they were a much rarer sight in previous eras. These statistics give some backing to the argument that "all NBA players do is chuck threes," as nearly half of field goals being three pointers gives credibility to this statement.
+
+Three pointers may have taken over the NBA as dissidents may claim, but has this actually improved or worsened the offense? Statistics would actually back the fact that the NBA has become better offensively as time has gone on. The highest offensive ratings are all from the past 7 NBA seasons, as since 2016 average offensive rating around the NBA has skyrocketed, and there has been very few decreases between each season. The highest offensive rating of all time actually belongs to the most recent season, while being one of the highest three point taking seasons of all time. So while people may believe the NBA has worsened over time, the offense has become more efficient.
+
+One interesting point is that despite there being a huge increase in the amount of three pointers being taken, it has not actually led to a much higher percentage shooting on average. While 3 point percentage was drastically low in the 80s and part of the 90s, it has stagnated to being about 36% on average since the 2003 season. This makes sense however, as the percentages remaining the same while more threes are attempted would lead to higher points per possession, which would lead to a higher offensive rating. This could actually further the point that people believe the amount of threes increasing is unnecessary, as players have not improved their efficiency, giving the appearance that it truly is "chucking up threes."
+
+Both three point attempts as well as offensive rating have been increasing nearly every season, and both have taken a drastic leap ever since Steph Curry's infamous 2016 unanimous MVP year. Before the 2015 championship, a common opinion among NBA media including Charles Barkley was that shooting teams could not win. Howeever, the Warriors changed that behind Steph Curry and Klay Thompson, who have both led the league in three pointers made in a season. Finding the underlying cause for the increases in offensive rating and 3 pointers attempted may be difficult, but undoubtedly they are correlated. The reason behind theses increases could be the league embracing statistics, which have always argued that three pointers are valuable, it could be because it has been introduced long enough that current NBA players grew up practicing to shoot more, it could have been the success the Warriors found behind their system, or a variety of other reasons.
+
+While people who scorn the NBA may claim that three pointers are too common and that they have actually worsened the game, it seems that it has actually caused an evolution. Offenses are blossoming more than they ever have, and this seems to be because the three pointer has become far more common.
+
+
+
+
+
+### 1. Loading Libraries and Documents
+
+```{r}
+#First we want to have access to all necessary libraries for what we want to do
+
+library(tidyverse)
+library(readxl)
+library(janitor)
+
+#This is the table I downloaded from basketball reference, where it includes all season averages from the seasons in which the three pointer was in the nba
+
+game_averages <- read_excel("sportsref_download.xlsx", col_types = c("text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric" ))
+
+#This is the file that has all the threee point leaders in NBA history
+
+three_leaders <- read_excel("3PointLeadersPerSeason.xlsx")
+```
+
+### 2. Briefly Describing the data
+
+```{r}
+#I initially did this to briefly describe the data however it ended up cluttering the HTML, so I eventually left it out as there was not a huge amount of useful information
+#Hmisc :: describe(game_averages)
+
+#Hmisc:: describe(three_leaders)
+
+```
+
+### 3. Filtering out ABA Players
+
+```{r}
+#Since we are only using NBA data for game_averages, we need to take out the ABA three point shooting leaders
+three_leaders <- filter(three_leaders, Lg == "NBA")
+three_leaders
+```
+
+### 4. Preparing the Data Sets to be joined
+
+```{r}
+#We want to rename with and select columns in three leaders that we want to include with the game averages
+three_leaders <- rename(three_leaders, "3P Leader" = "Player", "3PL Tm" = "Tm", "3PL Makes" = "3P") %>%
+  select("Season", "3P Leader", "3PL Tm", "3PL Makes")
+```
+
+### 5. Joining the Data Sets
+
+```{r}
+#Since you 
+ga_leaders <- full_join(game_averages, three_leaders)
+```
+
+### 6. Mutation for Decades in preparation of group by
+
+```{r}
+#We want to have the decades so that we can group by decade for analysis, so we mutate for a separate decades category
+#We will also count the 1979 - 1980 season as part of the 80s, as it was first introduced in 1979
+ga_leaders <- mutate(ga_leaders, decade = case_when(
+                     between(as.numeric(substr(Season, 1, 4)), 1979, 1989) ~ "1980s",
+                     between(as.numeric(substr(Season, 1, 4)), 1990, 1999) ~ "1990s",
+                     between(as.numeric(substr(Season, 1, 4)), 2000, 2009) ~ "2000s",
+                     between(as.numeric(substr(Season, 1, 4)), 2010, 2019) ~ "2010s",
+                     between(as.numeric(substr(Season, 1, 4)), 2020, 2029) ~ "2020s"))
+```
+
+### 7. Grouping by Decades
+
+```{r}
+#Thought it would be interesting to see how it number of threes made would compare by each decade
+decades <- ga_leaders %>%
+  group_by(decade) %>%
+  summarise(avg_3P = mean(`3P`))
+```
+
+### 8. Graphing the decade difference in 3PM
+
+```{r}
+#Actually graphing the difference in threes made
+ggplot(decades) + geom_col(aes(x = decade, y = avg_3P))
+```
+
+### 9. Checking each 3PM by season
+
+```{r}
+#Now I would like to see a scatter plot year by year to see if there are any significant jumps, or years we should investigate
+ggplot(ga_leaders) + geom_point(aes(x = Season, y = `3P`)) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+#This gives us 3 specific outliers, the 94-97 years 
+```
+
+### 10. Investigating the 94-97 seasons
+
+```{r}
+#While these look like extreme outliers, they actually are not. Due to decreased scoring that was related to the pace slowing down compared to the 80s and 70s, the NBA actually shortened the distance of the three point line to become a uniform 22 ft around the basket, while normally the corners are shorter in comparison to the top of the key. This resulted in both more three pointers as long midrangers became three pointers, as well as a better percentage because obviously shorter shots tend to be easier. So these are extreme outliers, but it is because of an actual change rather than noise within the data.
+select(ga_leaders, Season, `3P%`) %>%
+arrange(desc(`3P%`))
+#We can actually see that all of these seasons were in the top 10 in three point percentage, while the rest are all much later seasons, and the rest of the 90s seasons almost all fall below all seasons after 2000. Ultimately this just shows that those seasons will be outliers due to the shortened 3 point line.
+
+```
+
+### 11. Looking at Offensive Rating v. Points
+
+```{r}
+#The whole point of this investigation is to see why three point shooting has increased, so let us look at overall offensive efficiency. First we want to look at total points per game in a season, and then show why offensive rating is a better statistic.
+ggplot(ga_leaders, aes(x = Season, y = PTS)) +
+  geom_point(aes(color = "PTS"), size = 3) +
+  geom_point(aes(y = ORtg, color = "ORtg"), size = 3) +
+  scale_color_manual(values = c("PTS" = "purple", "ORtg" = "orange")) +
+  labs(title = "Points and Offensive Rating By Season",
+       x = "Season",
+       y = "Value") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  guides(color = guide_legend(title = "Color"))
+
+#We can actually see the reason why we cannot use points, as offensive rating is just the amount of points you would generate in 100 possessions. Because the amount of possessions has drastically differed throughout NBA history, we cannot only look at points. Offensive rating flattens these possessions, and is a better metric to measure how productive an offense is because it takes possessions into account.
+```
+
+### 12. Looking at the highest offensive ratings
+
+```{r}
+#Let us take a look at the highest offensive ratings over the years
+select(ga_leaders, Season, ORtg) %>%
+arrange( desc(ORtg))
+#We can see that the highest ones are all from the previous years since 2016, which is an important landmark of NBA history when it comes to three point shooting as that is the year that Steph Curry shocked the NBA world, having a unanimous MVP season behind a team built on shooting. It is also interesting that one of the only non-recent years to be in the top ten was one of the years that the three point line was shortened, meaning this could have inflated that particular year.
+```
+
+### 13. Looking at the offensive rating v. three made leaders
+
+```{r}
+ggplot(ga_leaders) + geom_point(aes(x = Season, y = `ORtg`, color = `3PL Makes`)) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(title = "Offensive Rating by Season")
+
+ggplot(ga_leaders) + geom_point(aes(x = Season, y = `3PL Makes`, color = ORtg)) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(title = "3 Point Makes Leader by Season")
+
+#From these charts we can actually see the correlation between the highest 3 point makes and offensive rating. This is an indication that the higher amount of three pointers that were made could be indicative of a higher offensive rating, especially in recent years.
+```
+
+### 14. Looking at percentages with respect to offensive rating by season
+```{r}
+#I wanted to look at how three point percentage had evolved over time and see how it compared with offensive rating
+ggplot(ga_leaders) + geom_point(aes(x = Season, y = `3P%`, color = ORtg)) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(title = "3 Point Percentage by Season")
+#We can see that percentages have actually not gone up drastically, however this makes sense because so many more three pointers are being taken. Even if the percentages are not going up by a large amount, we have already seen that the amount of threes being taken is much more.
+```
+
+
+
+### 15. Looking at 3PA v. ORtg
+```{r}
+#Another easy graphic that will illustrate the point I am trying to make is measuring three pointers attempted and offensive rating. 
+ggplot(ga_leaders, aes(x = Season, y = `3PA`)) +
+  geom_point(aes(color = "3PA"), size = 3) +
+  geom_point(aes(y = ORtg, color = "ORtg"), size = 3) +
+  scale_color_manual(values = c("3PA" = "darkgreen", "ORtg" = "magenta")) +
+  labs(title = "Three Pointers Attempted and Offensive Rating By Season",
+       x = "Season",
+       y = "Value") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  guides(color = guide_legend(title = "Color"))
+#We can actually see that they are correlated, as they both slightly increase over time, and start growing much faster after the 2015-2016 NBA season.
+```
+
+### 16. Offensive Rating by decade
+```{r}
+#I want to see the offensive rating by decade, which could be compared to our earlier graph which considered 3 pointers made. 
+decades <- ga_leaders %>%
+  group_by(decade) %>%
+  summarise(avg_3P = mean(`3P`), avg_ORtg = mean(ORtg))
+ggplot(decades) + geom_col(aes(x = decade, y = avg_ORtg)) +
+  coord_cartesian(ylim = c(90, 120))
+#We can see that offensive rating remained decently steady by decade and then there was a small jump in the 2010s, followed by a large jump in the 2020s. This actually affirms the belief that perhaps basketball was evolving.
+```
+
+### 17. Looking at how many shots were taken from outside the 3 point line compared to inside
+```{r}
+#I wanted to see how many field goals attempted were 3 pointers, and compare that to offensive rating. So I created this graph in order to compare this.
+ga_leaders <- mutate(ga_leaders, Per_3PA = `3PA`/ FGA)
+  ggplot(ga_leaders) + geom_point(aes(x = Season, y = Per_3PA, color = ORtg)) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+```
+
