@@ -26,7 +26,7 @@ Both three point attempts as well as offensive rating have been increasing nearl
 While people who scorn the NBA may claim that three pointers are too common and that they have actually worsened the game, it seems that it has actually caused an evolution. Offenses are blossoming more than they ever have, and this seems to be because the three pointer has become far more common.
 
 ## HTML File
-The HTML file for can be found <a href="https://github.com/athughes17/threepointanalysis/blob/main/ThreePointHistory.html">here</a>
+The HTML file for this analysis can be found <a href="https://github.com/athughes17/threepointanalysis/blob/main/ThreePointHistory.html">here</a>
 
 
 ## Data
